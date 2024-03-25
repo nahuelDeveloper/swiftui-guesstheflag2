@@ -7,10 +7,13 @@
 
 import SwiftUI
 
+let totalAttempts = 3
+
 struct ContentView: View {
     @State private var countries = ["Estonia", "France", "Germany", "Ireland", "Italy", "Nigeria", "Poland", "Spain", "UK", "Ukraine", "US"].shuffled()
     @State private var correctAnswer = Int.random(in: 0...2)
     
+    @State private var attemptsLeft = totalAttempts
     @State private var showingScore = false
     @State private var scoreTitle = ""
     @State private var score = 0
@@ -47,9 +50,9 @@ struct ContentView: View {
                 .foregroundStyle(.white)
             }
         }.alert(scoreTitle, isPresented: $showingScore) {
-            Button("Continue", action: askQuestion)
+            attemptsLeft > 0 ? Button("Continue", action: askQuestion) : Button("Restart", action: restartGame)
         } message: {
-            Text("Your score is \(score)")
+            Text(attemptsLeft > 0 ? "Your score is \(score)" : "")
         }
     }
     
@@ -62,7 +65,18 @@ struct ContentView: View {
             score -= 50
         }
         
+        attemptsLeft -= 1
+        if attemptsLeft == 0 {
+            scoreTitle = "Your total score is: \(score)\n Game over"
+        }
+        
         showingScore = true
+    }
+    
+    func restartGame() {
+        attemptsLeft = totalAttempts
+        score = 0
+        askQuestion()
     }
     
     func askQuestion() {
